@@ -1,0 +1,205 @@
+package folder2;
+
+import java.io.IOException;
+
+import folder2.App;
+import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.ParallelTransition;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
+
+public class Util {
+
+    // Switch Scene Methods
+    public static void switchTo(Node div, String fxml) {
+        Util.easeOut(div, 0.5);
+        Util.delay(0.5, () -> {
+            try {
+                Util.setRoot(fxml);
+            } catch (IOException e) {
+            }
+        });
+    }
+
+    public static void setRoot(String fxml) throws IOException {
+        App.scene.setRoot(loadFXML(fxml));
+    }
+
+    public static Parent loadFXML(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("views/" + fxml + ".fxml"));
+        return fxmlLoader.load();
+    }
+
+    // Basic Animations
+    public static FadeTransition fade(Node node, double duration, double from, double to, boolean reverse, int cycle) {
+        FadeTransition fade = new FadeTransition(Duration.seconds(duration), node);
+        fade.setFromValue(from);
+        fade.setToValue(to);
+        fade.setCycleCount(cycle);
+        fade.setAutoReverse(reverse);
+        fade.play();
+        return fade;
+    }
+
+    private static TranslateTransition translate(Node node, double duration, boolean horiz, double from, double to, boolean reverse, int cycle) {
+        TranslateTransition translate = new TranslateTransition(Duration.seconds(duration), node);
+        if (horiz) {
+            translate.setFromX(from);
+            translate.setToX(to);
+        } else {
+            translate.setFromY(from);
+            translate.setToY(to);
+        }
+        translate.setCycleCount(cycle);
+        translate.setAutoReverse(reverse);
+        translate.play();
+        return translate;
+    }
+
+    private static TranslateTransition translateBy(Node node, double duration, boolean horiz, double by, boolean auto_reverse, int cycle_count) {
+        TranslateTransition translate = new TranslateTransition(Duration.seconds(duration), node);
+        Runnable run = (horiz) ? () -> translate.setByX(by) : () -> translate.setByY(by);
+        translate.setAutoReverse(auto_reverse);
+        translate.setCycleCount(cycle_count);
+        run.run();
+        translate.play();
+        return translate;
+    }
+
+    // Transition Animations
+    public static void easeIn(Node node) {
+        double parent_height = -node.getBoundsInParent().getHeight();
+        translate(node, 1, false, parent_height * 0.1, 0, false, 1);
+        fade(node, 1, 0, 1, false, 1);
+    }
+
+    public static void easeOut(Node node, double duration) {
+        fade(node, duration, 1.0, 0.0, false, 1);
+        double startY = 0;
+        double endY = node.getBoundsInParent().getHeight() * 0.1;
+        translate(node, duration, false, startY, endY, false, 1);
+    }
+
+    // Background setup methods
+    public static ImageView createBackgroundImage(String img_file) {
+        return new ImageView(new Image(App.class.getResourceAsStream("pictures/others/" + img_file + ".png")));
+    }
+
+    public static void setBackground(ImageView bg_img, Pane particle_pane) {
+        bg_img.setImage(App.bg_img.getImage());
+        Util.createDustEffect(particle_pane, App.scene.getWidth(), App.scene.getHeight(), Color.GREENYELLOW, 0.5, 3);
+        bindImageHeight(bg_img, 1, 0);
+    }
+
+    // Bind methods
+    public static void bindImageHeight(ImageView img, double multiplier, double addend) {
+        img.fitHeightProperty().bind(App.scene.heightProperty().multiply(multiplier).add(addend));
+    }
+
+    public static void bindPane(StackPane pane, double multiplier, double addend) {
+        pane.prefWidthProperty().bind(App.scene.widthProperty().multiply(multiplier).add(addend));
+        pane.prefHeightProperty().bind(App.scene.heightProperty().multiply(multiplier).add(addend));
+    }
+
+    public static void bindBorderPane(BorderPane pane, double multiplier, double addend) {
+        pane.prefWidthProperty().bind(App.scene.widthProperty().multiply(multiplier).add(addend));
+        pane.prefHeightProperty().bind(App.scene.heightProperty().multiply(multiplier).add(addend));
+    }
+
+    public static void bindVBox(VBox pane, double multiplier, double addend) {
+        pane.prefWidthProperty().bind(App.scene.widthProperty().multiply(multiplier).add(addend));
+        pane.prefHeightProperty().bind(App.scene.heightProperty().multiply(multiplier).add(addend));
+    }
+
+    public static void bindHBox(HBox pane, double multiplier, double addend) {
+        pane.prefWidthProperty().bind(App.scene.widthProperty().multiply(multiplier).add(addend));
+        pane.prefHeightProperty().bind(App.scene.heightProperty().multiply(multiplier).add(addend));
+    }
+
+    // Apply methods
+    public static void applyShadow(Node imageView, double radius, double spread, double offsetX, double offsetY, Color color) {
+        DropShadow shadow = new DropShadow();
+        shadow.setRadius(radius);
+        shadow.setSpread(spread);
+        shadow.setOffsetX(offsetX);
+        shadow.setOffsetY(offsetY);
+        shadow.setColor(color);
+
+        imageView.setEffect(shadow);
+    }
+
+    public static void applyFloatingEffect(Node imageView, double duration, int range) {
+        translateBy(imageView, duration, false, range, true, TranslateTransition.INDEFINITE);
+    }
+
+    public static void applyFadeTransition(Node imageView, double duration) {
+        fade(imageView, duration, 0, 1, true, -1);
+    }
+
+    public static void applyFadeOut(Node imageView, double duration) {
+        
+    }
+
+    public static void fadeIn(Node imageView, double duration) {
+        fade(imageView, duration, 0, 1, false, 1);
+    }
+
+    // Other effects
+    public static void createDustEffect(Pane particlePane, double backgroundWidth, double backgroundHeight, Color color, double min_size, double size_range) {
+        Timeline particleTimeline = new Timeline(new KeyFrame(Duration.millis(50), event -> spawnParticle(particlePane, color, min_size, size_range)));
+        particleTimeline.setCycleCount(Timeline.INDEFINITE);
+        particleTimeline.play();
+
+        particlePane.widthProperty().addListener((obs, oldVal, newVal) -> spawnParticle(particlePane, color, min_size, size_range));
+        particlePane.heightProperty().addListener((obs, oldVal, newVal) -> spawnParticle(particlePane, color, min_size, size_range));
+    }
+
+    private static void spawnParticle(Pane particlePane, Color color, double min_size, double size_range) {
+        double backgroundWidth = particlePane.getWidth();
+        double backgroundHeight = particlePane.getHeight();
+
+        Circle particle = new Circle(Math.random() * min_size + size_range, color);
+        particle.setOpacity(0.8);
+
+        particle.setTranslateX(Math.random() * backgroundWidth);
+        particle.setTranslateY(Math.random() * backgroundHeight);
+
+        double speedX = (Math.random() - 0.5) * 2;
+
+        particlePane.getChildren().add(particle);
+
+        TranslateTransition moveTransition = translateBy(particle, 10.0, false, -backgroundHeight, false, 1);
+        moveTransition.setByX(speedX * 30);
+
+        ParallelTransition parallelTransition = new ParallelTransition(
+                moveTransition,
+                fade(particle, 1, 1, 0, false, 1)
+        );
+
+        parallelTransition.setOnFinished(e -> particlePane.getChildren().remove(particle));
+        parallelTransition.play();
+    }
+
+    // Timing methods
+    public static void delay(double seconds, Runnable action) {
+        PauseTransition pause = new PauseTransition(Duration.seconds(seconds));
+        pause.setOnFinished(event -> action.run());
+        pause.play();
+    }
+}

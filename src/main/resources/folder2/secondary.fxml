@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="folder2.SecondaryController">
+   <children>
+      <ImageView fx:id="bg_img" preserveRatio="true" StackPane.alignment="CENTER">
+         <image>
+            <Image url="@background.png" />
+         </image>
+      </ImageView>
+        <ImageView fx:id="select_img" fitHeight="117.0" fitWidth="368.0" onMouseClicked="#switchToTertiary" preserveRatio="true" StackPane.alignment="CENTER"> 
+         <image> 
+             <Image url="@Select_Pet.png" />
+         </image>
+         <effect>
+            <Blend />
+         </effect>
+         <StackPane.margin>
+            <Insets bottom="50.0" />
+         </StackPane.margin>
+     </ImageView>
+   </children>
+</StackPane>
